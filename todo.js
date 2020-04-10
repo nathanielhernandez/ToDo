@@ -235,9 +235,10 @@ var placeHolders = {
     'Bake a cake',
     'Take a walk',
     'Learn React.js',
-    'Gaming break!',
-    'Master the maineframe',
-    'Become h4ck3r man'
+    'Gaming break',
+    'Master the mainframe',
+    'Become h4ck3r man',
+    'Play Animal Crossing',
   ],
   randomPlacehold: function() {
     var max = this.list.length;
