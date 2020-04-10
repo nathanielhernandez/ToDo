@@ -141,7 +141,40 @@ var view = {
       toggleCheckmark.checked = true;
     }
     return toggleCheckmark;
+  },
+  swapToEditView: function(elementClicked) {
+    var currentTodoItem = elementClicked.parentNode.previousElementSibling;
+    var checkbox = currentTodoItem.previousElementSibling;
+    var deleteButton = elementClicked.nextElementSibling;
+    var grandParentNode = elementClicked.parentNode.parentNode;
+    var parentNode = elementClicked.parentNode;
 
+    checkbox.disabled = true;
+
+    var newTodoTextInput = document.createElement('input');
+    newTodoTextInput.type = 'text';
+    newTodoTextInput.className = 'newTodoTextInput';
+    newTodoTextInput.value = currentTodoItem.textContent;
+
+    grandParentNode.removeChild(currentTodoItem);
+    grandParentNode.insertBefore(newTodoTextInput, elementClicked.parentNode);
+
+    console.log(elementClicked);
+
+    parentNode.removeChild(elementClicked);
+    parentNode.insertBefore(view.createSaveButton(), deleteButton);
+    
+  },
+  swapToReadView: function(elementClicked) {
+    var textInput = elementClicked.parentNode.previousElementSibling;
+    var checkbox = textInput.previousElementSibling;
+    var deleteButton = elementClicked.nextElementSibling;
+    var parentNode = elementClicked.parentNode;
+    var grandParentNode = parentNode.parentNode;
+
+    var newTodoText = textInput.value;
+
+    handler.changeTodo(grandParentNode.id, newTodoText);
   },
   setUpEventListeners: function() {
     var todosUl = document.querySelector('ul');
@@ -160,40 +193,24 @@ var view = {
       }
 
       if (elementClicked.className === 'editButton') {
-        var currentTodoItem = elementClicked.parentNode.previousElementSibling;
-        var checkbox = currentTodoItem.previousElementSibling;
-        var deleteButton = elementClicked.nextElementSibling;
-        var grandParentNode = elementClicked.parentNode.parentNode;
-        var parentNode = elementClicked.parentNode;
-
-        checkbox.disabled = true;
-
-        var newTodoTextInput = document.createElement('input');
-        newTodoTextInput.type = 'text';
-        newTodoTextInput.className = 'newTodoTextInput';
-        newTodoTextInput.value = currentTodoItem.textContent;
-
-        grandParentNode.removeChild(currentTodoItem);
-        grandParentNode.insertBefore(newTodoTextInput, elementClicked.parentNode);
-
-        console.log(elementClicked);
-
-        parentNode.removeChild(elementClicked);
-        parentNode.insertBefore(view.createSaveButton(), deleteButton);
+        view.swapToEditView(elementClicked);
       }
-
       if (elementClicked.className === 'saveButton') {
-        var textInput = elementClicked.parentNode.previousElementSibling;
-        var checkbox = textInput.previousElementSibling;
-        var deleteButton = elementClicked.nextElementSibling;
-        var parentNode = elementClicked.parentNode;
-        var grandParentNode = parentNode.parentNode;
-
-        var newTodoText = textInput.value;
-
-        handler.changeTodo(grandParentNode.id, newTodoText);
-
+        view.swapToReadView(elementClicked);
       }
+    });
+
+    var body = document.querySelector('ul');
+    body.addEventListener('keyup', function(event) {
+        elementClicked = event.target;
+        saveButton = elementClicked.nextElementSibling.childNodes[0];
+        console.log(saveButton);
+
+        if (elementClicked.className === "newTodoTextInput") {
+          if (event.keyCode === 13) {
+            view.swapToReadView(saveButton);
+          }
+        }
     });
 
     var input = document.getElementById('addTodoTextInput');
@@ -218,15 +235,17 @@ var placeHolders = {
     'Bake a cake',
     'Take a walk',
     'Learn React.js',
-    'Gaming break!'
+    'Gaming break!',
+    'Master the maineframe',
+    'Become h4ck3r man'
   ],
   randomPlacehold: function() {
-    debugger;
     var max = this.list.length;
     var random = this.random(0, max);
     while (random === pastRandom) {
       random = this.random(0, max);
     }
+    pastRandom = random;
     console.log(random);
     console.log(this.list[random]);
     return this.list[random];
